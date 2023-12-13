@@ -1,22 +1,34 @@
 require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
+const express = require("express");
+const bodyParser = require("body-parser");
 const { getTimeLeft } = require("./Controller/TimeController");
 
-const express = require("express");
+const TOKEN = process.env.TOKEN;
+const WEBHOOKURL = process.env.WEBHOOKURL;
+
 const app = express();
+
+app.use(bodyParser.json());
+
+const bot = new TelegramBot(TOKEN, { polling: false });
+
+bot.setWebHook(`${WEBHOOKURL}/bot${TOKEN}`);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
+});
+
+app.post(`/bot${TOKEN}`, (req, res) => {
+  const body = req.body;
+  bot.processUpdate(body);
+  res.sendStatus(200);
 });
 
 const port = 4040;
 app.listen(port, () => {
   console.log("Server runing at" + port);
 });
-
-const TOKEN = process.env.TOKEN;
-
-const bot = new TelegramBot(TOKEN, { polling: true });
 
 // Dictionary to store user data during the conversation
 const user_data = [];
