@@ -72,6 +72,7 @@ bot.onText(/\/startgiveaway/, async (msg) => {
 });
 
 bot.on("message", (message) => {
+  console.log(message.text);
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
     const chatId = message.chat.id;
     if (!user_data[chatId]) {
