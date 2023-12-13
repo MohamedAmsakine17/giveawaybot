@@ -62,78 +62,80 @@ bot.onText(/\/startgiveaway/, async (msg) => {
 bot.on("message", (message) => {
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
     const chatId = message.chat.id;
-
-    switch (states) {
-      case "title":
-        user_data[chatId].title = message.text;
-        bot.sendMessage(
-          chatId,
-          `*✨🌟 Great news! 🌟✨*\nThe title is set to: ${user_data[chatId].title}.\nHow many winners will there be? 🏆`,
-          textOpt
-        );
-        states = "winners";
-        break;
-      case "winners":
-        user_data[chatId].winners = parseInt(message.text);
-        if (
-          !isNaN(user_data[chatId].winners) &&
-          user_data[chatId].winners > 0
-        ) {
+    if (!user_data[chatId]) {
+      switch (states) {
+        case "title":
+          user_data[chatId].title = message.text;
           bot.sendMessage(
             chatId,
-            `*🎉✨ Awesome! ${user_data[chatId].winners} winners. ✨🎉*\nNow, what will be the duration of the giveaway by hours? ⏰`,
+            `*✨🌟 Great news! 🌟✨*\nThe title is set to: ${user_data[chatId].title}.\nHow many winners will there be? 🏆`,
             textOpt
           );
-          states = "duration";
-        } else {
-          bot.sendMessage(
-            chatId,
-            "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of winners. 🏆*",
-            textOpt
-          );
-        }
-        break;
-      case "duration":
-        user_data[chatId].duration = parseFloat(message.text);
-        if (
-          !isNaN(user_data[chatId].duration) &&
-          user_data[chatId].duration > 0
-        ) {
-          // ----
-          const inlineKeyboard = {
-            inline_keyboard: [
-              [{ text: "Start Giveaway", callback_data: "startGiveaway" }],
-            ],
-          };
-          const endTime =
-            Date.now() + user_data[chatId].duration * 60 * 60 * 1000; // Convert hours to milliseconds
-          active_giveaways[chatId] = {
-            title: user_data[chatId].title,
-            winners: user_data[chatId].winners,
-            endTime,
-            participants: [],
-          };
+          states = "winners";
+          break;
+        case "winners":
+          user_data[chatId].winners = parseInt(message.text);
+          if (
+            !isNaN(user_data[chatId].winners) &&
+            user_data[chatId].winners > 0
+          ) {
+            bot.sendMessage(
+              chatId,
+              `*🎉✨ Awesome! ${user_data[chatId].winners} winners. ✨🎉*\nNow, what will be the duration of the giveaway by hours? ⏰`,
+              textOpt
+            );
+            states = "duration";
+          } else {
+            bot.sendMessage(
+              chatId,
+              "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of winners. 🏆*",
+              textOpt
+            );
+          }
+          break;
+        case "duration":
+          user_data[chatId].duration = parseFloat(message.text);
+          if (
+            !isNaN(user_data[chatId].duration) &&
+            user_data[chatId].duration > 0
+          ) {
+            // ----
+            const inlineKeyboard = {
+              inline_keyboard: [
+                [{ text: "Start Giveaway", callback_data: "startGiveaway" }],
+              ],
+            };
+            const endTime =
+              Date.now() + user_data[chatId].duration * 60 * 60 * 1000; // Convert hours to milliseconds
+            active_giveaways[chatId] = {
+              title: user_data[chatId].title,
+              winners: user_data[chatId].winners,
+              endTime,
+              participants: [],
+            };
 
-          bot.sendMessage(
-            chatId,
-            `*✨🎉 Perfect! The giveaway will run for ${getTimeLeft(
-              endTime
-            )}. 🕒*\nYou've successfully set up the giveaway. If you have any more commands, feel free to ask! 🚀`,
-            { ...textOpt, reply_markup: JSON.stringify(inlineKeyboard) }
-          );
+            bot.sendMessage(
+              chatId,
+              `*✨🎉 Perfect! The giveaway will run for ${getTimeLeft(
+                endTime
+              )}. 🕒*\nYou've successfully set up the giveaway. If you have any more commands, feel free to ask! 🚀`,
+              { ...textOpt, reply_markup: JSON.stringify(inlineKeyboard) }
+            );
 
-          states = "done";
-        } else {
-          bot.sendMessage(
-            chatId,
-            "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of hours. 🏆*",
-            textOpt
-          );
-        }
-        break;
+            states = "done";
+          } else {
+            bot.sendMessage(
+              chatId,
+              "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of hours. 🏆*",
+              textOpt
+            );
+          }
+          break;
+      }
+
+      console.log(message);
+      console.log(states);
     }
-    console.log(message);
-    console.log(states);
   }
 });
 
@@ -236,7 +238,7 @@ bot.on("callback_query", (callbackQuery) => {
       active_giveaways[chatId].participants[userId] = { username: fullName };
       bot.sendMessage(
         chatId,
-        `🎉 ${fullName} You have entered the giveaway! 🍀 Good luck! 🌈`
+        `🎉 ${fullName} You have entered the giveaway! 🍀 Good luck! `
       );
     } else {
       bot.sendMessage(chatId, "🙅‍♂️ You are already in the giveaway. 🎁");
@@ -312,11 +314,25 @@ bot.onText(/\/helpgiveaway/, (msg) => {
 });
 
 // Handle /cancel command to cancel the setup
-bot.onText(/\/cancelgiveaway/, (msg) => {
+bot.onText(/\/cancelgiveaway/, async (msg) => {
   const chatId = msg.chat.id;
-  if (user_data[chatId]) {
-    bot.sendMessage(chatId, "*❌ The setup has been canceled. ❌*", textOpt);
-    delete user_data[chatId];
-    delete active_giveaways[chatId];
+  const userId = msg.from.id;
+  const chatMember = await bot.getChatMember(chatId, userId);
+
+  // Check if the user has administrative privileges
+  if (
+    chatMember.status === "administrator" ||
+    chatMember.status === "creator"
+  ) {
+    if (user_data[chatId]) {
+      bot.sendMessage(chatId, "*❌ The setup has been canceled. ❌*", textOpt);
+      delete user_data[chatId];
+      delete active_giveaways[chatId];
+    }
+  } else {
+    bot.sendMessage(
+      chatId,
+      "🚫 You are not authorized to use this command. ❌"
+    );
   }
 });
