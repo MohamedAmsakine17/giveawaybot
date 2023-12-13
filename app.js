@@ -166,7 +166,7 @@ bot.on("callback_query", (callbackQuery) => {
 
     bot.sendMessage(
       chatId,
-      "*🚀 The giveaway has started! 🍀 Good luck to all participants! 🌈*  \n\n_Click the button below to enter!_ 🚀 \n\nPowered by: @habibihideout ",
+      "*🚀 The giveaway has started! 🍀 Good luck to all participants! *  \n\n_Click the button below to enter!_ 🚀 \n\nPowered by: @habibihideout ",
       { ...textOpt, reply_markup: JSON.stringify(inlineKeyboard) }
     );
 
