@@ -348,6 +348,11 @@ bot.onText(/\/cancelgiveaway/, async (msg) => {
       bot.sendMessage(chatId, "*❌ The setup has been canceled. ❌*", textOpt);
       delete user_data[chatId];
       delete active_giveaways[chatId];
+    } else {
+      bot.sendMessage(
+        chatId,
+        "🚫 There is no active giveaway at the moment. 🕰️    "
+      );
     }
   } else {
     bot.sendMessage(
