@@ -328,7 +328,7 @@ bot.onText(/\/helpgiveaway/, (msg) => {
 
   bot.sendMessage(
     chatId,
-    "🤖 *Bot Commands:* 🤖 \n\n1. */currentgiveaway* - Display details about the current giveaway.\n2. */entergiveaway* - Enter the current giveaway.\n3. */participants* - Show the list of participants in the current giveaway.\n4. */helpgiveaway* - Display this help message.\n5. */startgiveaway* - Start a new giveaway.\n6. */cancelgiveaway* - Cancel the setup of the current giveaway.\n\n🎉 *Giveaway Commands:* 🎉\n\n- To start a new giveaway, use the /startgiveaway command and follow the instructions.\n\nNote: Replace placeholders such as [Your Title], [Number of Winners], etc., with the actual details for your giveaway.\n\nFeel free to explore and enjoy the giveaway experience! 🌟\n\nPowered by: @habibihideout",
+    "🤖 *Bot Commands:* 🤖 \n\n1. */currentgiveaway* - Display details about the current giveaway.\n2. */participants* - Show the list of participants in the current giveaway.\n3. */helpgiveaway* - Display this help message.\n4. */startgiveaway* - Start a new giveaway.\n5. */cancelgiveaway* - Cancel the setup of the current giveaway.\n\n🎉 *Giveaway Commands:* 🎉\n\n- To start a new giveaway, use the /startgiveaway command and follow the instructions.\n\nNote: Replace placeholders such as [Your Title], [Number of Winners], etc., with the actual details for your giveaway.\n\nFeel free to explore and enjoy the giveaway experience! 🌟\n\nPowered by: @habibihideout",
     textOpt
   );
 });
