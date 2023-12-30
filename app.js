@@ -75,8 +75,14 @@ bot.on("message", (message) => {
   if (message.text == undefined) {
     return;
   }
-  console.log(message.text);
+
+  const botUsername = "@Giveaway_new_bot";
+  if (!message.text.includes(botUsername)) {
+    return;
+  }
+
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
+    console.log(message.text);
     const chatId = message.chat.id;
     if (user_data[chatId]) {
       switch (states) {
@@ -148,9 +154,6 @@ bot.on("message", (message) => {
           }
           break;
       }
-
-      console.log(message);
-      console.log(states);
     }
   }
 });
