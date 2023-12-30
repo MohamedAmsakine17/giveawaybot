@@ -15,6 +15,8 @@ const bot = new TelegramBot(TOKEN, { polling: false });
 
 bot.setWebHook(`${WEBHOOKURL}/bot${TOKEN}`);
 
+const botUsername = "@Giveaway_new_bot";
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
@@ -71,7 +73,7 @@ bot.onText(/\/startgiveaway/, async (msg) => {
   }
 });
 
-bot.on("message", (message) => {
+bot.onText(new RegExp(botUsername), (message) => {
   if (message.text == undefined) {
     return;
   }
