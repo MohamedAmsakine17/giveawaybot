@@ -76,10 +76,6 @@ bot.on("message", (message) => {
     return;
   }
 
-  const botUsername = "@Giveaway_new_bot";
-  if (!message.text.includes(botUsername)) {
-    return;
-  }
 
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
     console.log(message.text);
