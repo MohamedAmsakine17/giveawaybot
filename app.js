@@ -78,13 +78,17 @@ bot.onText(new RegExp(botUsername), (message) => {
     return;
   }
 
+  const cleanedMessage = message.text
+    .replace(new RegExp(botUsername, "g"), "")
+    .trim();
+
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
     console.log(message.text);
     const chatId = message.chat.id;
     if (user_data[chatId]) {
       switch (states) {
         case "title":
-          user_data[chatId].title = message.text;
+          user_data[chatId].title = cleanedMessage;
           bot.sendMessage(
             chatId,
             `*✨🌟 Great news! 🌟✨*\nThe title is set to: ${user_data[chatId].title}.\nHow many winners will there be? 🏆`,
@@ -93,7 +97,7 @@ bot.onText(new RegExp(botUsername), (message) => {
           states = "winners";
           break;
         case "winners":
-          user_data[chatId].winners = parseInt(message.text);
+          user_data[chatId].winners = parseInt(cleanedMessage);
           if (
             !isNaN(user_data[chatId].winners) &&
             user_data[chatId].winners > 0
@@ -113,7 +117,7 @@ bot.onText(new RegExp(botUsername), (message) => {
           }
           break;
         case "duration":
-          user_data[chatId].duration = parseFloat(message.text);
+          user_data[chatId].duration = parseFloat(cleanedMessage);
           if (
             !isNaN(user_data[chatId].duration) &&
             user_data[chatId].duration > 0
