@@ -78,10 +78,13 @@ bot.onText(new RegExp(botUsername), (message) => {
     return;
   }
 
+<<<<<<< HEAD
   const botUsername = "@Giveaway_new_bot";
   if (!message.text.includes(botUsername)) {
     return;
   }
+=======
+>>>>>>> ee3aa6aef3d835fc216e7947b95173e9814d1632
 
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
     console.log(message.text);
