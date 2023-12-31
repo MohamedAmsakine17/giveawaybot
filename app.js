@@ -46,32 +46,6 @@ const textOpt = {
 };
 
 // Command to start the conversation
-bot.onText(/\/startgiveaway/, async (msg) => {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  const chatMember = await bot.getChatMember(chatId, userId);
-
-  // Check if the user has administrative privileges
-  if (
-    chatMember.status === "administrator" ||
-    chatMember.status === "creator"
-  ) {
-    if (!user_data[chatId]) {
-      bot.sendMessage(
-        chatId,
-        "*✨🎉🌟 Greetings, Giveaway Enthusiast! 🌟🎉✨*\n\nReady to embark on a new giveaway adventure? 🚀\nTell me, what's the title of this exciting event? 🎁",
-        textOpt
-      );
-      user_data[chatId] = { title: "", winners: 0, duration: 0 };
-      states = "title";
-    }
-  } else {
-    bot.sendMessage(
-      chatId,
-      "🚫 You are not authorized to use this command. ❌"
-    );
-  }
-});
 
 bot.onText(new RegExp(botUsername), async (message) => {
   if (message.text == undefined) {
