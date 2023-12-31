@@ -73,7 +73,7 @@ bot.onText(/\/startgiveaway/, async (msg) => {
   }
 });
 
-bot.onText(new RegExp(botUsername), (message) => {
+bot.onText(new RegExp(botUsername), async (message) => {
   if (message.text == undefined) {
     return;
   }
@@ -83,77 +83,85 @@ bot.onText(new RegExp(botUsername), (message) => {
     .trim();
 
   if (message.text.charAt(0) != "/" && user_data[message.chat.id]) {
-    console.log(message.text);
     const chatId = message.chat.id;
-    if (user_data[chatId]) {
-      switch (states) {
-        case "title":
-          user_data[chatId].title = cleanedMessage;
-          bot.sendMessage(
-            chatId,
-            `*✨🌟 Great news! 🌟✨*\nThe title is set to: ${user_data[chatId].title}.\nHow many winners will there be? 🏆`,
-            textOpt
-          );
-          states = "winners";
-          break;
-        case "winners":
-          user_data[chatId].winners = parseInt(cleanedMessage);
-          if (
-            !isNaN(user_data[chatId].winners) &&
-            user_data[chatId].winners > 0
-          ) {
-            bot.sendMessage(
-              chatId,
-              `*🎉✨ Awesome! ${user_data[chatId].winners} winners. ✨🎉*\nNow, what will be the duration of the giveaway by hours? ⏰`,
-              textOpt
-            );
-            states = "duration";
-          } else {
-            bot.sendMessage(
-              chatId,
-              "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of winners. 🏆*",
-              textOpt
-            );
-          }
-          break;
-        case "duration":
-          user_data[chatId].duration = parseFloat(cleanedMessage);
-          if (
-            !isNaN(user_data[chatId].duration) &&
-            user_data[chatId].duration > 0
-          ) {
-            // ----
-            const inlineKeyboard = {
-              inline_keyboard: [
-                [{ text: "Start Giveaway", callback_data: "startGiveaway" }],
-              ],
-            };
-            const endTime =
-              Date.now() + user_data[chatId].duration * 60 * 60 * 1000; // Convert hours to milliseconds
-            active_giveaways[chatId] = {
-              title: user_data[chatId].title,
-              winners: user_data[chatId].winners,
-              endTime,
-              participants: [],
-            };
+    const userId = message.from.id;
 
-            bot.sendMessage(
-              chatId,
-              `*✨🎉 Perfect! The giveaway will run for ${getTimeLeft(
-                endTime
-              )}. 🕒*\nYou've successfully set up the giveaway. If you have any more commands, feel free to ask! 🚀`,
-              { ...textOpt, reply_markup: JSON.stringify(inlineKeyboard) }
-            );
+    const chatMember = await bot.getChatMember(chatId, userId);
 
-            states = "done";
-          } else {
+    if (
+      chatMember.status === "administrator" ||
+      chatMember.status === "creator"
+    ) {
+      if (user_data[chatId]) {
+        switch (states) {
+          case "title":
+            user_data[chatId].title = cleanedMessage;
             bot.sendMessage(
               chatId,
-              "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of hours. 🏆*",
+              `*✨🌟 Great news! 🌟✨*\nThe title is set to: ${user_data[chatId].title}.\nHow many winners will there be? 🏆`,
               textOpt
             );
-          }
-          break;
+            states = "winners";
+            break;
+          case "winners":
+            user_data[chatId].winners = parseInt(cleanedMessage);
+            if (
+              !isNaN(user_data[chatId].winners) &&
+              user_data[chatId].winners > 0
+            ) {
+              bot.sendMessage(
+                chatId,
+                `*🎉✨ Awesome! ${user_data[chatId].winners} winners. ✨🎉*\nNow, what will be the duration of the giveaway by hours? ⏰`,
+                textOpt
+              );
+              states = "duration";
+            } else {
+              bot.sendMessage(
+                chatId,
+                "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of winners. 🏆*",
+                textOpt
+              );
+            }
+            break;
+          case "duration":
+            user_data[chatId].duration = parseFloat(cleanedMessage);
+            if (
+              !isNaN(user_data[chatId].duration) &&
+              user_data[chatId].duration > 0
+            ) {
+              // ----
+              const inlineKeyboard = {
+                inline_keyboard: [
+                  [{ text: "Start Giveaway", callback_data: "startGiveaway" }],
+                ],
+              };
+              const endTime =
+                Date.now() + user_data[chatId].duration * 60 * 60 * 1000; // Convert hours to milliseconds
+              active_giveaways[chatId] = {
+                title: user_data[chatId].title,
+                winners: user_data[chatId].winners,
+                endTime,
+                participants: [],
+              };
+
+              bot.sendMessage(
+                chatId,
+                `*✨🎉 Perfect! The giveaway will run for ${getTimeLeft(
+                  endTime
+                )}. 🕒*\nYou've successfully set up the giveaway. If you have any more commands, feel free to ask! 🚀`,
+                { ...textOpt, reply_markup: JSON.stringify(inlineKeyboard) }
+              );
+
+              states = "done";
+            } else {
+              bot.sendMessage(
+                chatId,
+                "*⚠️🙅‍♂️ Please enter a valid number greater than 0 for the number of hours. 🏆*",
+                textOpt
+              );
+            }
+            break;
+        }
       }
     }
   }
@@ -328,7 +336,7 @@ bot.onText(/\/helpgiveaway/, (msg) => {
 
   bot.sendMessage(
     chatId,
-    "🤖 *Bot Commands:* 🤖 \n\n1. */currentgiveaway* - Display details about the current giveaway.\n2. */participants* - Show the list of participants in the current giveaway.\n3. */helpgiveaway* - Display this help message.\n4. */startgiveaway* - Start a new giveaway.\n5. */cancelgiveaway* - Cancel the setup of the current giveaway.\n\n🎉 *Giveaway Commands:* 🎉\n\n- To start a new giveaway, use the /startgiveaway command and follow the instructions.\n\nNote: Replace placeholders such as [Your Title], [Number of Winners], etc., with the actual details for your giveaway.\n\nFeel free to explore and enjoy the giveaway experience! 🌟\n\nPowered by: @habibihideout",
+    "🤖 *Bot Commands:* 🤖 \n\n1. */currentgiveaway* - Display details about the current giveaway.\n2. */participants* - Show the list of participants in the current giveaway.\n3. */helpgiveaway* - Display this help message.\n4. */startgiveaway* - Start a new giveaway.\n5. */cancelgiveaway* - Cancel the setup of the current giveaway.\n\n🎉 *Giveaway Commands:* 🎉\n\n- To start a new giveaway, use the /startgiveaway command and follow the instructions.\n\nNote: Replace placeholders such as [Your Title] @Giveaway_new_bot, [Number of Winners] @Giveaway_new_bot, etc., with the actual details for your giveaway.\n\nFeel free to explore and enjoy the giveaway experience! 🌟\n\nPowered by: @habibihideout",
     textOpt
   );
 });
